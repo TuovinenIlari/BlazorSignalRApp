@@ -8,7 +8,7 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   solution: '**/BlazorSignalRApp.sln'
-  project: '**/BlazorSignalRApp.csproj'
+  project: '**/BlazorSignalRApp/BlazorSignalRApp.csproj'
 
 steps:
 - task: NuGetToolInstaller@1
