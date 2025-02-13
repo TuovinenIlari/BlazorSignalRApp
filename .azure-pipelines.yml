@@ -1,35 +1,40 @@
 trigger:
-  branches:
-    include:
-      - main  # Change this to your branch name if different
+- none
 
 pool:
   vmImage: 'windows-latest'
 
-steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '7.x'  # Change this based on your Blazor version
+variables:
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  solution: '**/BlazorSignalRApp.sln'
+  project: '**/BlazorSignalRApp.csproj'
 
-- task: DotNetCoreCLI@2
+steps:
+- task: NuGetToolInstaller@1
+  name: 'NuGetToolInstaller'
+  displayName: 'NuGet Tool Installer'
+
+- task: NuGetCommand@2
+  name: 'NuGetRestore'
+  displayName: 'NuGet Restore Packages'
   inputs:
     command: 'restore'
-    projects: '**/*.csproj'
+    restoreSolution: '$(solution)'
+    feedsToUse: 'select'
 
 - task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '**/*.csproj'
-    arguments: '--configuration Release'
-
-- task: DotNetCoreCLI@2
+  name: 'Publish'
+  displayName: 'Publish'
   inputs:
     command: 'publish'
     publishWebProjects: true
-    arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
-
+    arguments: '--configuration$(BuildConfiguration) --output$(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: false
 - task: PublishBuildArtifacts@1
+  name: 'PublishBuildArtifacts'
+  displayName: 'Publish Build Artifacts'
   inputs:
-    pathToPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: 'drop'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'TEST'
+    publishLocation: 'Container'
